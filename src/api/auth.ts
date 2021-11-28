@@ -2,43 +2,31 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 
 import knex from '../../knex/knex';
+import * as dbHelper from '../utils/db/helpers';
 
 const authRouter: Router = Router();
 
-const existsInTable: (
-  table: string,
-  column: string,
-  value: string
-) => Promise<boolean> = async (table, column, value) => {
-  return knex(table)
-    .select('id')
-    .where(column, value)
-    .first()
-    .then((record) => {
-      if (!record) return false;
-      return true;
-    });
-};
-
-authRouter.post('/register', async (req, res) => {
+authRouter.post('/register', async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
 
-    const usernameExists: boolean = await existsInTable(
+    const usernameExists: boolean = await dbHelper.existsInTable(
       'users',
       'username',
       username
     );
 
     if (usernameExists) {
-      res.send('Username is already taken');
-      return;
+      throw Error('Username is already taken');
     }
 
-    const emailExists: boolean = await existsInTable('users', 'email', email);
+    const emailExists: boolean = await dbHelper.existsInTable(
+      'users',
+      'email',
+      email
+    );
     if (emailExists) {
-      res.send('Email is already taken');
-      return;
+      throw Error('Email is already taken');
     }
 
     const hash: string = await bcrypt.hash(password, 10);
@@ -49,14 +37,11 @@ authRouter.post('/register', async (req, res) => {
 
     res.send(`Successfully created user with user id ${id}`);
   } catch (error: any) {
-    res.send(
-      `Caught Error: ${error.message}` ??
-        `Error in POST /api/auth/register: ${req.body ?? ''}`
-    );
+    next(error);
   }
 });
 
-authRouter.post('/login', async (req, res) => {
+authRouter.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -73,10 +58,11 @@ authRouter.post('/login', async (req, res) => {
     );
 
     if (!isValidPassword) throw Error('Invalid password');
+    req.session.user = { userId: record.id, isLoggedIn: true };
 
     res.send('Success');
   } catch (error: any) {
-    res.send(`Error logging in ${error.message}`);
+    next(error);
   }
 });
 
