@@ -1,8 +1,8 @@
 import Router from 'express';
-import { usersRouter } from './users';
+import { authRouter } from './auth';
 
 const apiRouter = Router();
 
-apiRouter.use('/users', usersRouter);
+apiRouter.use('/auth', authRouter);
 
 export { apiRouter };
