@@ -41,10 +41,10 @@ authRouter.post('/register', async (req, res) => {
       return;
     }
 
-    const passwordHash: string = await bcrypt.hash(password, 10);
+    const hash: string = await bcrypt.hash(password, 10);
 
     const id: Array<number> = await knex('users')
-      .insert({ username, email, password: passwordHash })
+      .insert({ username, email, password_hash: hash })
       .returning('id');
 
     res.send(`Successfully created user with user id ${id}`);
@@ -53,6 +53,30 @@ authRouter.post('/register', async (req, res) => {
       `Caught Error: ${error.message}` ??
         `Error in POST /api/auth/register: ${req.body ?? ''}`
     );
+  }
+});
+
+authRouter.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const record = await knex('users')
+      .select('id', 'username', 'email', 'password_hash')
+      .where('email', email)
+      .first();
+
+    if (!record) throw Error('User with email does not exist');
+
+    const isValidPassword = await bcrypt.compare(
+      password,
+      record.password_hash
+    );
+
+    if (!isValidPassword) throw Error('Invalid password');
+
+    res.send('Success');
+  } catch (error: any) {
+    res.send(`Error logging in ${error.message}`);
   }
 });
 

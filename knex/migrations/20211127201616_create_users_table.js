@@ -3,7 +3,7 @@ exports.up = function (knex) {
     table.increments('id').primary();
     table.string('email').unique().notNullable();
     table.string('username').unique().notNullable();
-    table.string('password').notNullable();
+    table.string('password_hash').notNullable();
     table.enu('permissions', ['admin', 'moderator']);
     table.timestamp('created_at').defaultTo(knex.fn.now());
     table.timestamp('updated_at').defaultTo(knex.fn.now());
