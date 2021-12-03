@@ -15,11 +15,13 @@ const store = new knexSessionStore({ knex });
 // TODO: dotenv or config
 const secret = 'dungeon_secret';
 
+const oneHour = 60 * 60 * 1000;
+
 export default session({
   secret,
   resave: false,
   cookie: {
-    maxAge: 60000 // ten seconds, for testing
+    maxAge: oneHour
   },
   store
 });
