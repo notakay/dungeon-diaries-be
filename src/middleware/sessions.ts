@@ -21,7 +21,8 @@ export default session({
   secret,
   resave: false,
   cookie: {
-    maxAge: oneHour
+    maxAge: oneHour,
+    httpOnly: true
   },
   store
 });
