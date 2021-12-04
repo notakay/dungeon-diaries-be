@@ -8,12 +8,12 @@
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "celebrate": "^15.0.0",
     "connect-session-knex": "^2.1.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^5.0.0-alpha.8",
     "express-session": "^1.17.2",
-    "joi": "^17.5.0",
     "knex": "^0.95.14",
     "lodash": "^4.17.21",
     "pg": "^8.7.1"

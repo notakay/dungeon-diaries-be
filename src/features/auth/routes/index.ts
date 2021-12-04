@@ -1,11 +1,10 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
+import { celebrate } from 'celebrate';
 
 import knex from '../../../../knex/knex';
-
 import * as dbHelper from '../../../utils/db/helpers';
 import { BadRequestError } from '../../../utils/errors';
-import { validate } from '../../../middleware/validate';
 
 import { registerSchema, loginSchema } from '../schemas/schemas';
 
@@ -13,7 +12,7 @@ const authRouter: Router = Router();
 
 authRouter.post(
   '/register',
-  validate(registerSchema),
+  celebrate(registerSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { username, email, password } = req.body;
@@ -52,7 +51,7 @@ authRouter.post(
 
 authRouter.post(
   '/login',
-  validate(loginSchema),
+  celebrate(loginSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;
