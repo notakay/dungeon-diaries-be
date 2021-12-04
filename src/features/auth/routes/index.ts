@@ -7,7 +7,7 @@ import * as dbHelper from '../../../utils/db/helpers';
 import { BadRequestError } from '../../../utils/errors';
 import { validate } from '../../../middleware/validate';
 
-import { registerSchema, loginSchema } from './schemas';
+import { registerSchema, loginSchema } from '../schemas/schemas';
 
 const authRouter: Router = Router();
 

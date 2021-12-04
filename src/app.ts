@@ -1,6 +1,6 @@
 import config from '../config';
 import express, { Application } from 'express';
-import { apiRouter } from './api';
+import { apiRouter } from './routes';
 import sessions from './middleware/sessions';
 import cors from 'cors';
 
@@ -9,7 +9,6 @@ app.use(express.json());
 app.use(sessions);
 app.use(cors());
 
-app.get('/', (_req, res) => res.send('hello'));
 app.use('/api', apiRouter);
 
 app.get('*', (req, res, next) => {
