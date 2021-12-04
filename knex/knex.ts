@@ -1,7 +1,6 @@
 import Knex from 'knex';
 import knexfile from '../knexfile';
+import config from '../config';
 
-// TODO: dotenv or config
-const env = 'development';
-
-export default Knex(knexfile[env]);
+// @ts-ignore
+export default Knex(knexfile[config['environment']]);

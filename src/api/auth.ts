@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 
 import knex from '../../knex/knex';
 import * as dbHelper from '../utils/db/helpers';
+import { BadRequestError } from '../utils/errors';
 
 const authRouter: Router = Router();
 
@@ -17,7 +18,7 @@ authRouter.post('/register', async (req, res, next) => {
     );
 
     if (usernameExists) {
-      throw Error('Username is already taken');
+      throw new BadRequestError('Username is already taken');
     }
 
     const emailExists: boolean = await dbHelper.existsInTable(
@@ -26,7 +27,7 @@ authRouter.post('/register', async (req, res, next) => {
       email
     );
     if (emailExists) {
-      throw Error('Email is already taken');
+      throw new BadRequestError('Email is already taken');
     }
 
     const hash: string = await bcrypt.hash(password, 10);
@@ -50,20 +51,29 @@ authRouter.post('/login', async (req, res, next) => {
       .where('email', email)
       .first();
 
-    if (!record) throw Error('User with email does not exist');
+    if (!record) throw new BadRequestError('User with email does not exist');
 
     const isValidPassword = await bcrypt.compare(
       password,
       record.password_hash
     );
 
-    if (!isValidPassword) throw Error('Invalid password');
+    if (!isValidPassword) throw new BadRequestError('Invalid password');
     req.session.user = { userId: record.id, isLoggedIn: true };
 
     res.send('Success');
   } catch (error: any) {
     next(error);
   }
+});
+
+authRouter.post('/logout', (req, res, next) => {
+  req.session.destroy((err) => {
+    if (err) {
+      next(err);
+    }
+    res.status(200).send();
+  });
 });
 
 export { authRouter };
