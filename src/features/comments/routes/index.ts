@@ -34,12 +34,10 @@ commentsRouter.post(
         .select('depth', 'lineage')
         .where({ id: parentCommentId, post_id: postId })
         .first();
-      console.log(parentComment);
       //@ts-ignore
       depth = parentComment.depth + 1;
       //@ts-ignore
       lineage = parentComment.lineage + `${parentCommentId}/`;
-      console.log(depth, lineage);
     }
 
     const id: Array<number> = await knex('comments')
