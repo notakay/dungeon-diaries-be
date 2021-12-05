@@ -2,7 +2,9 @@ import { Router, Request, Response, NextFunction } from 'express';
 
 import knex from '../../../../knex/knex';
 import { isLoggedIn } from '../../../middleware/auth';
-import { BadRequestError, NotFoundError } from '../../../utils/errors';
+import { NotFoundError } from '../../../utils/errors';
+import { getPostByIdSchema, createPostSchema } from '../schemas';
+import { Celebrate } from '../../../lib/celebrate';
 
 const postsRouter: Router = Router();
 
@@ -21,6 +23,7 @@ postsRouter.get(
 
 postsRouter.get(
   '/:postId',
+  Celebrate(getPostByIdSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     const { postId } = req.params;
     const record = await knex('posts')
@@ -38,15 +41,12 @@ postsRouter.get(
 
 postsRouter.post(
   '/',
+  Celebrate(createPostSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // isLoggedIn middleware should ensure that userId is not undefined
-      const userId: number | undefined = req.session.user?.userId;
-      if (!userId)
-        throw new BadRequestError('An error as occured, userId is undefined');
+      const userId: number = req.session.user?.userId;
 
-      const { title = '', content = '' } = req.body;
-      if (!title) throw new BadRequestError('Title cannot be null');
+      const { title, content } = req.body;
 
       const id: Array<number> = await knex('posts')
         .insert({ title, content, user_id: userId })

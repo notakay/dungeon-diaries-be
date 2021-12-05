@@ -6,7 +6,7 @@ import knex from '../../../../knex/knex';
 import * as dbHelper from '../../../utils/db/helpers';
 import { BadRequestError } from '../../../utils/errors';
 
-import { registerSchema, loginSchema } from '../schemas/schemas';
+import { registerSchema, loginSchema } from '../schemas';
 
 const authRouter: Router = Router();
 
