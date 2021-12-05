@@ -3,12 +3,6 @@ import { Knex } from 'knex';
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable('comments', (table) => {
     table.increments('id').primary();
-    table.integer('parent_id').defaultTo(null);
-    table.string('comment', 1000).notNullable();
-    table.integer('depth').defaultTo(0);
-    table.string('lineage', 1000).defaultTo('/');
-    table.timestamp('created_at').defaultTo(knex.fn.now());
-    table.timestamp('updated_at').defaultTo(knex.fn.now());
     table
       .integer('user_id')
       .references('id')
@@ -19,6 +13,12 @@ export async function up(knex: Knex): Promise<void> {
       .references('id')
       .inTable('posts')
       .onDelete('SET NULL');
+    table.integer('parent_id').defaultTo(null);
+    table.string('content', 1000).notNullable();
+    table.integer('depth').defaultTo(0);
+    table.string('lineage', 1000).defaultTo('/');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
+    table.timestamp('updated_at').defaultTo(knex.fn.now());
   });
 }
 
