@@ -13,5 +13,6 @@ if (envFound.error) {
 export default {
   environment: process.env.NODE_ENV,
   port: parseInt(process.env.PORT! ?? 3000, 10),
-  databasePassword: process.env.POSTGRES_PASSWORD ?? 'postgres'
+  databasePassword: process.env.POSTGRES_PASSWORD ?? 'postgres',
+  sessionSecret: process.env.SESSION_SECRET ?? 'secret'
 };
