@@ -3,6 +3,8 @@ import express, { Application } from 'express';
 import { apiRouter } from './routes';
 import sessions from './middleware/sessions';
 import cors from 'cors';
+import { isCelebrateError } from 'celebrate';
+import { BadRequestError } from './utils/errors';
 
 const app: Application = express();
 app.use(express.json());
@@ -18,7 +20,28 @@ app.get('*', (req, res, next) => {
   next(error);
 });
 
-// * Error handler
+// * Error handlers
+
+// Error handling from celebrate
+// @ts-ignore
+// * https://stackoverflow.com/questions/55954369/how-to-manage-self-created-error-message-instead-of-using-default-celebrate-hap
+app.use((error, req, res, next) => {
+  if (isCelebrateError(error)) {
+    let errorMessage = '';
+
+    if (error.details) {
+      for (const [field, errorDetails] of error.details.entries()) {
+        errorDetails.details.forEach(({ message }) => {
+          errorMessage += `${message}\n`;
+        });
+      }
+    }
+    return next(new BadRequestError(errorMessage.trim()));
+  }
+
+  return next(error);
+});
+
 // @ts-ignore
 app.use((error, req, res, next) => {
   // TODO more specific validation message from Joi?

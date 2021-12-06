@@ -1,18 +1,18 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
-import { celebrate } from 'celebrate';
+import { Celebrate } from '../../../lib/celebrate';
 
 import knex from '../../../../knex/knex';
 import * as dbHelper from '../../../utils/db/helpers';
 import { BadRequestError } from '../../../utils/errors';
 
-import { registerSchema, loginSchema } from '../schemas/schemas';
+import { registerSchema, loginSchema } from '../schemas';
 
 const authRouter: Router = Router();
 
 authRouter.post(
   '/register',
-  celebrate(registerSchema),
+  Celebrate(registerSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { username, email, password } = req.body;
@@ -51,7 +51,7 @@ authRouter.post(
 
 authRouter.post(
   '/login',
-  celebrate(loginSchema),
+  Celebrate(loginSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;

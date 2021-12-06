@@ -2,7 +2,11 @@ import { Router, Request, Response, NextFunction } from 'express';
 
 import knex from '../../../../knex/knex';
 import { isLoggedIn } from '../../../middleware/auth';
+
+import { getPostByIdSchema, createPostSchema } from '../schemas';
+import { Celebrate } from '../../../lib/celebrate';
 import { BadRequestError, NotFoundError } from '../../../utils/errors';
+
 
 const postsRouter: Router = Router();
 
@@ -21,6 +25,7 @@ postsRouter.get(
 
 postsRouter.get(
   '/:postId',
+  Celebrate(getPostByIdSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     const { postId } = req.params;
     const record = await knex('posts')
@@ -38,6 +43,7 @@ postsRouter.get(
 
 postsRouter.post(
   '/',
+  Celebrate(createPostSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // isLoggedIn middleware should ensure that userId is not undefined
