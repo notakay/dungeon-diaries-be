@@ -2,6 +2,14 @@ import { Router, Request, Response, NextFunction } from 'express';
 
 import knex from '../../../../knex/knex';
 import { isLoggedIn } from '../../../middleware/auth';
+import { Celebrate } from '../../../lib/celebrate';
+import {
+  getCommentsSchema,
+  createCommentSchema,
+  deleteCommentSchema
+} from '../schemas';
+import { sanitizeDeletedComment } from '../transforms';
+import { BadRequestError } from '../../../utils/errors';
 
 const commentsRouter: Router = Router();
 
@@ -12,15 +20,18 @@ commentsRouter.use(isLoggedIn);
 
 commentsRouter.get(
   '/:postId',
+  Celebrate(getCommentsSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     const { postId } = req.params;
     const { commentId = null, depth = 1 } = req.body;
 
-    const records = await knex('comments')
+    const rawRecords = await knex('comments')
       .join('users', 'users.id', 'comments.user_id')
       .select('comments.*', 'users.username')
       .where('comments.post_id', postId)
       .orderBy('comments.depth', 'asc');
+
+    const records = rawRecords.map(sanitizeDeletedComment);
 
     const comments = {};
 
@@ -48,6 +59,7 @@ commentsRouter.get(
 
 commentsRouter.post(
   '/:postId',
+  Celebrate(createCommentSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     const { postId } = req.params;
     const { content, parentCommentId = null } = req.body;
@@ -77,6 +89,25 @@ commentsRouter.post(
       })
       .returning('id');
     res.send(`Successfully created comment with comment id ${id}`);
+  }
+);
+
+commentsRouter.delete(
+  '/:commentId',
+  Celebrate(deleteCommentSchema),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { commentId } = req.params;
+    const authUserId = req.session.user?.userId;
+
+    const updatedCount = await knex('comments')
+      .where({ id: commentId, user_id: authUserId })
+      .update({ deleted_at: knex.fn.now() });
+
+    if (!updatedCount) {
+      throw new BadRequestError('Could not delete comment');
+    }
+
+    res.status(200).send();
   }
 );
 

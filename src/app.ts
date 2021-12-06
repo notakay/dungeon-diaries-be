@@ -44,8 +44,7 @@ app.use((error, req, res, next) => {
 
 // @ts-ignore
 app.use((error, req, res, next) => {
-  // TODO more specific validation message from Joi?
-  // TODO also should configure celebratte to use Joi with Full mode instead of partial so that it doesnt fail after checking one field
+  // TODO check if sending sensitive errors in prod
   if (error.joi) {
     return res.status(400).json({ error: error.joi.message });
   }

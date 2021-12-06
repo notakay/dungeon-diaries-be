@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 
 import knex from '../../../../knex/knex';
 import { isLoggedIn } from '../../../middleware/auth';
-import { sanitizeUser } from '../transforms/user';
+import { sanitizeUser } from '../transforms';
 
 const usersRouter: Router = Router();
 
