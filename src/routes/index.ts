@@ -1,5 +1,6 @@
 import Router from 'express';
 import { authRouter } from '../features/auth/routes';
+
 import { commentsRouter } from '../features/comments/routes';
 import { postsRouter } from '../features/posts/routes';
 import { usersRouter } from '../features/users/routes';

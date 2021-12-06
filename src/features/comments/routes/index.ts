@@ -7,6 +7,9 @@ const commentsRouter: Router = Router();
 
 commentsRouter.use(isLoggedIn);
 
+// TODO: Fix ts-ignores and
+// TODO: improve comments GET for more functionality
+
 commentsRouter.get(
   '/:postId',
   async (req: Request, res: Response, next: NextFunction) => {
@@ -15,16 +18,39 @@ commentsRouter.get(
 
     const records = await knex('comments')
       .join('users', 'users.id', 'comments.user_id')
-      .select('comments.content', 'users.username')
-      .where('comments.post_id', postId);
-    res.send(records);
+      .select('comments.*', 'users.username')
+      .where('comments.post_id', postId)
+      .orderBy('comments.depth', 'asc');
+
+    const comments = {};
+
+    records.forEach((record) => {
+      if (record.lineage === '/') {
+        //@ts-ignore
+        comments[record.id] = { ...record, children: {} };
+      } else {
+        const ancestors = record.lineage.split('/');
+        ancestors.shift();
+        ancestors.pop();
+
+        const parent = ancestors.reduce(
+          //@ts-ignore
+          (prev, key) => prev[key].children,
+          comments
+        );
+        parent[record.id] = { ...record, children: {} };
+      }
+    });
+
+    res.send(comments);
   }
 );
 
 commentsRouter.post(
-  '/',
+  '/:postId',
   async (req: Request, res: Response, next: NextFunction) => {
-    const { postId, content, parentCommentId = null } = req.body;
+    const { postId } = req.params;
+    const { content, parentCommentId = null } = req.body;
 
     let lineage = '/';
     let depth = 0;
