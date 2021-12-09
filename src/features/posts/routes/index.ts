@@ -7,7 +7,6 @@ import { getPostByIdSchema, createPostSchema } from '../schemas';
 import { Celebrate } from '../../../lib/celebrate';
 import { BadRequestError, NotFoundError } from '../../../utils/errors';
 
-
 const postsRouter: Router = Router();
 
 postsRouter.use(isLoggedIn);
@@ -16,8 +15,13 @@ postsRouter.get(
   '/',
   async (_req: Request, res: Response, next: NextFunction) => {
     const posts = await knex('posts')
-      .select('*')
-      .orderBy('created_at', 'desc')
+      .join('users', 'users.id', 'posts.user_id')
+      .select(
+        'users.username as author',
+        'posts.user_id as author_id',
+        'posts.*'
+      )
+      .orderBy('posts.created_at', 'desc')
       .catch((error) => next(error));
     res.json({ posts: posts });
   }
@@ -30,7 +34,11 @@ postsRouter.get(
     const { postId } = req.params;
     const record = await knex('posts')
       .join('users', 'users.id', 'posts.user_id')
-      .select('users.username', 'posts.*')
+      .select(
+        'users.username as author',
+        'posts.user_id as author_id',
+        'posts.*'
+      )
       .where('posts.id', postId)
       .first()
       .catch((error) => next(error));

@@ -6,10 +6,15 @@ import cors from 'cors';
 import { isCelebrateError } from 'celebrate';
 import { BadRequestError } from './utils/errors';
 
+const corsOptions = {
+  credentials: true,
+  origin: ['http://localhost:3000']
+};
+
 const app: Application = express();
 app.use(express.json());
 app.use(sessions);
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use('/api', apiRouter);
 
