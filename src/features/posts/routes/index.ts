@@ -14,15 +14,21 @@ postsRouter.use(isLoggedIn);
 postsRouter.get(
   '/',
   async (_req: Request, res: Response, next: NextFunction) => {
+    const commentsCountSubquery = knex('comments')
+      .count()
+      .where('comments.post_id', knex.raw('??', 'posts.id'))
+      .as('comment_count');
+
     const posts = await knex('posts')
       .join('users', 'users.id', 'posts.user_id')
       .select(
+        'posts.*',
         'users.username as author',
         'posts.user_id as author_id',
-        'posts.*'
+        commentsCountSubquery
       )
-      .orderBy('posts.created_at', 'desc')
-      .catch((error) => next(error));
+      .orderBy('posts.created_at', 'desc');
+
     res.json({ posts: posts });
   }
 );
@@ -32,12 +38,19 @@ postsRouter.get(
   Celebrate(getPostByIdSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     const { postId } = req.params;
+
+    const commentsCountSubquery = knex('comments')
+      .count()
+      .where('comments.post_id', knex.raw('??', 'posts.id'))
+      .as('comment_count');
+
     const record = await knex('posts')
       .join('users', 'users.id', 'posts.user_id')
       .select(
         'users.username as author',
         'posts.user_id as author_id',
-        'posts.*'
+        'posts.*',
+        commentsCountSubquery
       )
       .where('posts.id', postId)
       .first()

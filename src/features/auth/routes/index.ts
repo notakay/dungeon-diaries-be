@@ -38,12 +38,10 @@ authRouter.post(
 
       const hash: string = await bcrypt.hash(password, 10);
 
-      const id: Array<number> = await knex('users')
+      const [user] = await knex('users')
         .insert({ username, email, password_hash: hash })
-        .returning('id');
+        .returning('*');
 
-      // Although we can just return username, email from the request body, I think a query is more suitable here as we extend the user to include more fields like bio etc.
-      const user = await knex('users').select('*').where('id', id).first();
       res.json(sanitizeUser(user));
     } catch (error: any) {
       next(error);
