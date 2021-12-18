@@ -15,13 +15,13 @@ const store = new knexSessionStore({ knex });
 
 const secret = config.sessionSecret;
 
-const oneHour = 60 * 60 * 1000;
+const hundredDays = 100 * 24 * 60 * 60 * 1000;
 
 export default session({
   secret,
   resave: false,
   cookie: {
-    maxAge: oneHour,
+    maxAge: hundredDays,
     httpOnly: true
   },
   store

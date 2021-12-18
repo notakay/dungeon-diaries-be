@@ -8,7 +8,7 @@ import {
   createCommentSchema,
   deleteCommentSchema
 } from '../schemas';
-import { sanitizeDeletedComment } from '../transforms';
+import { sanitizeDeletedComment, nestComments } from '../transforms';
 import { BadRequestError } from '../../../utils/errors';
 
 const commentsRouter: Router = Router();
@@ -27,31 +27,17 @@ commentsRouter.get(
 
     const rawRecords = await knex('comments')
       .join('users', 'users.id', 'comments.user_id')
-      .select('comments.*', 'users.username')
+      .select(
+        'comments.*',
+        'comments.user_id as author_id',
+        'users.username as author'
+      )
       .where('comments.post_id', postId)
-      .orderBy('comments.depth', 'asc');
+      .orderBy('comments.created_at', 'asc');
 
     const records = rawRecords.map(sanitizeDeletedComment);
 
-    const comments = {};
-
-    records.forEach((record) => {
-      if (record.lineage === '/') {
-        //@ts-ignore
-        comments[record.id] = { ...record, children: {} };
-      } else {
-        const ancestors = record.lineage.split('/');
-        ancestors.shift();
-        ancestors.pop();
-
-        const parent = ancestors.reduce(
-          //@ts-ignore
-          (prev, key) => prev[key].children,
-          comments
-        );
-        parent[record.id] = { ...record, children: {} };
-      }
-    });
+    const comments = nestComments(records);
 
     res.send(comments);
   }

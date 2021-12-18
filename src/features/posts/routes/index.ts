@@ -10,6 +10,7 @@ import { Celebrate } from '../../../lib/celebrate';
 import { BadRequestError, NotFoundError } from '../../../utils/errors';
 
 const { region, bucket } = process.env;
+
 const postsRouter: Router = Router();
 
 postsRouter.use(isLoggedIn);
@@ -17,10 +18,21 @@ postsRouter.use(isLoggedIn);
 postsRouter.get(
   '/',
   async (_req: Request, res: Response, next: NextFunction) => {
+    const commentsCountSubquery = knex('comments')
+      .count()
+      .where('comments.post_id', knex.raw('??', 'posts.id'))
+      .as('comment_count');
+
     const posts = await knex('posts')
-      .select('*')
-      .orderBy('created_at', 'desc')
-      .catch((error) => next(error));
+      .join('users', 'users.id', 'posts.user_id')
+      .select(
+        'posts.*',
+        'users.username as author',
+        'posts.user_id as author_id',
+        commentsCountSubquery
+      )
+      .orderBy('posts.created_at', 'desc');
+
     res.json({ posts: posts });
   }
 );
@@ -67,9 +79,20 @@ postsRouter.get(
   Celebrate(getPostByIdSchema),
   async (req: Request, res: Response, next: NextFunction) => {
     const { postId } = req.params;
+
+    const commentsCountSubquery = knex('comments')
+      .count()
+      .where('comments.post_id', knex.raw('??', 'posts.id'))
+      .as('comment_count');
+
     const record = await knex('posts')
       .join('users', 'users.id', 'posts.user_id')
-      .select('users.username', 'posts.*')
+      .select(
+        'users.username as author',
+        'posts.user_id as author_id',
+        'posts.*',
+        commentsCountSubquery
+      )
       .where('posts.id', postId)
       .first()
       .catch((error) => next(error));

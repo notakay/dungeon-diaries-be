@@ -5,8 +5,8 @@ import { Celebrate } from '../../../lib/celebrate';
 import knex from '../../../../knex/knex';
 import * as dbHelper from '../../../utils/db/helpers';
 import { BadRequestError } from '../../../utils/errors';
-
 import { registerSchema, loginSchema } from '../schemas';
+import { sanitizeUser } from '../../users/transforms';
 
 const authRouter: Router = Router();
 
@@ -38,11 +38,11 @@ authRouter.post(
 
       const hash: string = await bcrypt.hash(password, 10);
 
-      const id: Array<number> = await knex('users')
+      const [user] = await knex('users')
         .insert({ username, email, password_hash: hash })
-        .returning('id');
+        .returning('*');
 
-      res.send(`Successfully created user with user id ${id}`);
+      res.json(sanitizeUser(user));
     } catch (error: any) {
       next(error);
     }
@@ -71,7 +71,12 @@ authRouter.post(
       if (!isValidPassword) throw new BadRequestError('Invalid password');
       req.session.user = { userId: record.id, isLoggedIn: true };
 
-      res.send('Success');
+      // Although we can just return username, email from the request body, I think a query is more suitable here as we extend the user to include more fields like bio etc.
+      const user = await knex('users')
+        .select('*')
+        .where('id', record.id)
+        .first();
+      res.json(sanitizeUser(user));
     } catch (error: any) {
       next(error);
     }
