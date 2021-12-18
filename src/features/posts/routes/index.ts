@@ -40,7 +40,10 @@ postsRouter.get(
           process.env.salt
       )
       .digest('hex');
-    const cache_key = crypto.createHash('md5').update(object_key).digest('hex');
+    const cache_key = crypto
+      .createHash('md5')
+      .update(object_key + process.env.salt)
+      .digest('hex');
 
     var params = {
       Bucket: bucket,
