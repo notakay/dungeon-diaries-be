@@ -13,7 +13,7 @@ uploadsRouter.get(
   '/presigned',
   async (req: Request, res: Response, _next: NextFunction) => {
     // Generate random object key
-    const object_key = crypto
+    let object_key = crypto
       .createHash('md5')
       .update(
         // @ts-ignore
@@ -22,6 +22,7 @@ uploadsRouter.get(
           config.salt
       )
       .digest('hex');
+    object_key += '.jpg';
 
     // Generate cache_key from objecct key
     const cache_key = crypto
@@ -35,7 +36,7 @@ uploadsRouter.get(
       if (err) throw err;
       await knex('upload_intents')
         .insert({ object_key, cache_key })
-        .then(() => res.send(data));
+        .then(() => res.send({ cache_key, ...data }));
     });
   }
 );

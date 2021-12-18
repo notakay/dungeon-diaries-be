@@ -6,7 +6,7 @@ import { isLoggedIn } from '../../../middleware/auth';
 import { Celebrate } from '../../../lib/celebrate';
 import { getResourceURL } from '../../../lib/s3';
 import { getPostByIdSchema, createPostSchema } from '../schemas';
-import { NotFoundError } from '../../../utils/errors';
+import { NotFoundError, BadRequestError } from '../../../utils/errors';
 
 const postsRouter: Router = Router();
 postsRouter.use(isLoggedIn);
@@ -76,13 +76,13 @@ postsRouter.post(
         // @ts-ignore
         const result = await knex('upload_intents')
           .select('object_key')
-          .where('object_key', cache_key)
+          .where('cache_key', cache_key)
           .first();
 
         object_key = result?.object_key;
 
         if (!object_key) {
-          throw new BadRequestError('Invalid image URL');
+          throw new BadRequestError('Error uploading image');
         }
       }
 
