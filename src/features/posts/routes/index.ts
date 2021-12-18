@@ -43,7 +43,7 @@ postsRouter.get(
     const s3 = new S3({ region });
 
     // TODO: Go over this
-    const object_key = crypto
+    let object_key = crypto
       .createHash('md5')
       .update(
         // @ts-ignore
@@ -52,6 +52,9 @@ postsRouter.get(
           process.env.salt
       )
       .digest('hex');
+
+    object_key += '.jpg';
+
     const cache_key = crypto
       .createHash('md5')
       .update(object_key + process.env.salt)
@@ -116,17 +119,24 @@ postsRouter.post(
       const { title = '', content = '', cache_key } = req.body;
       if (!title) throw new BadRequestError('Title cannot be null');
 
-      let object_key = '';
+      let object_key = null;
       if (cache_key) {
         // @ts-ignore
-        object_key = await knex('upload_intents')
+        const result = await knex('upload_intents')
           .select('object_key')
-          .where('object_key', cache_key);
+          .where('object_key', cache_key)
+          .first();
+
+        object_key = result?.object_key;
+
+        if (!object_key) {
+          throw new BadRequestError('Invalid image URL');
+        }
       }
 
       // NOTE: relies on us using aws s3 as image upload provider
       let image = object_key
-        ? `https://${region}.s3.${region}.amazonaws.com/${object_key} `
+        ? `https://${bucket}.s3.${region}.amazonaws.com/${object_key} `
         : '';
 
       const id: Array<number> = await knex('posts')
