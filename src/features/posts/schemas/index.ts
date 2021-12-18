@@ -9,6 +9,7 @@ export const getPostByIdSchema = {
 export const createPostSchema = {
   body: Joi.object({
     title: Joi.string().required(),
-    content: Joi.string().required()
+    content: Joi.string().required(),
+    cache_key: Joi.string()
   })
 };
