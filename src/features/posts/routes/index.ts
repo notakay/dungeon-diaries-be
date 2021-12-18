@@ -71,16 +71,22 @@ postsRouter.post(
       const userId: number | undefined = req.session.user?.userId;
       const { title = '', content = '', cache_key } = req.body;
 
-      let object_key = '';
-      let image = '';
+      let object_key = null;
       if (cache_key) {
         // @ts-ignore
-        object_key = await knex('upload_intents')
+        const result = await knex('upload_intents')
           .select('object_key')
-          .where('object_key', cache_key);
+          .where('object_key', cache_key)
+          .first();
 
-        image = getResourceURL(object_key);
+        object_key = result?.object_key;
+
+        if (!object_key) {
+          throw new BadRequestError('Invalid image URL');
+        }
       }
+
+      let image = getResourceURL(object_key);
 
       const id: Array<number> = await knex('posts')
         .insert({ title, content, user_id: userId, image })
