@@ -42,6 +42,8 @@ authRouter.post(
         .insert({ username, email, password_hash: hash })
         .returning('*');
 
+      req.session.user = { userId: user.id, isLoggedIn: true };
+
       res.json(sanitizeUser(user));
     } catch (error: any) {
       next(error);
