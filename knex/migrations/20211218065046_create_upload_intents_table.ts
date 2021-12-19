@@ -4,7 +4,7 @@ import { Knex } from 'knex';
 // will move onto a cache based solution later
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable('upload_intents', (table) => {
-    table.string('cache_key', 1000).primary();
+    table.string('session_id', 1000).primary();
     table.string('object_key', 1000).notNullable();
   });
 }

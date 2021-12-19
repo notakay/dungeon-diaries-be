@@ -10,6 +10,7 @@ export const createPostSchema = {
   body: Joi.object({
     title: Joi.string().required(),
     content: Joi.string().required(),
-    cache_key: Joi.string().optional()
+    location: Joi.string().optional(),
+    key: Joi.string().optional()
   })
 };

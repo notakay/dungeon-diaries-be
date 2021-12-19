@@ -4,7 +4,6 @@ import knex from '../../../../knex/knex';
 import { isLoggedIn } from '../../../middleware/auth';
 
 import { Celebrate } from '../../../lib/celebrate';
-import { getResourceURL } from '../../../lib/s3';
 import { getPostByIdSchema, createPostSchema } from '../schemas';
 import { NotFoundError, BadRequestError } from '../../../utils/errors';
 
@@ -68,28 +67,29 @@ postsRouter.post(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // isLoggedIn middleware should ensure that userId is not undefined
-      const userId: number | undefined = req.session.user?.userId;
-      const { title = '', content = '', cache_key } = req.body;
+      const user_id: number | undefined = req.session.user?.userId;
+      const { title = '', content = '', location = '', key = '' } = req.body;
 
-      let object_key = null;
-      if (cache_key) {
-        // @ts-ignore
+      let image = '';
+
+      // if uploading image, check db/cache
+      if (key) {
         const result = await knex('upload_intents')
           .select('object_key')
-          .where('cache_key', cache_key)
+          .where('session_id', req.sessionID)
           .first();
 
-        object_key = result?.object_key;
-
-        if (!object_key) {
+        // user could modify the location not much we can do, unless we're
+        // getting a callback lambda directly when the image uploads
+        if (result?.object_key === key && location.split('/').pop() === key) {
+          image = location;
+        } else {
           throw new BadRequestError('Error uploading image');
         }
       }
 
-      let image = getResourceURL(object_key);
-
       const id: Array<number> = await knex('posts')
-        .insert({ title, content, user_id: userId, image })
+        .insert({ title, content, user_id, image })
         .returning('id');
 
       res.send(`Successfully created post with post id ${id}`);
