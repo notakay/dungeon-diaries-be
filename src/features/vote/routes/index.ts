@@ -15,10 +15,7 @@ voteRouter.post(
     const user_id = req.session.user?.userId;
     const post_id = req.params.postId;
 
-    // enforce limits
-    let vote = req.body.vote ?? 0;
-    if (vote < 0) vote = -1;
-    else if (vote > 0) vote = 1;
+    const vote = req.body.vote ?? 0;
 
     const prevCountRes = await knex('post_votes')
       .select('vote')

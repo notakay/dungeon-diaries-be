@@ -5,6 +5,6 @@ export const postVoteSchema = {
     postId: Joi.number().required()
   }),
   body: Joi.object({
-    vote: Joi.number().required()
+    vote: Joi.number().integer().min(-1).max(1).required()
   })
 };
