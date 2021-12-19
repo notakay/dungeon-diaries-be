@@ -34,12 +34,4 @@ uploadsRouter.post(
   }
 );
 
-uploadsRouter.get(
-  '/presigned',
-  async (req: Request, res: Response, _next: NextFunction) => {
-    console.log(req.sessionID);
-    res.send(req.session);
-  }
-);
-
 export { uploadsRouter };
