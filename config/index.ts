@@ -16,6 +16,5 @@ export default {
   databasePassword: process.env.POSTGRES_PASSWORD ?? 'postgres',
   sessionSecret: process.env.SESSION_SECRET ?? 'secret',
   region: process.env.AWS_REGION ?? '',
-  bucket: process.env.AWS_BUCKET ?? '',
-  salt: process.env.SALT ?? ''
+  bucket: process.env.AWS_BUCKET ?? ''
 };

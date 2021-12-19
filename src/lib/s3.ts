@@ -9,17 +9,12 @@ function getPresignedParams(object_key: string) {
   return {
     Bucket: config.bucket,
     Fields: {
-      key: object_key
+      key: object_key,
+      acl: 'public-read',
+      success_action_status: '201'
     },
-
     Expires: 180
   };
 }
 
-function getResourceURL(object_key: string) {
-  return object_key
-    ? `https://${bucket}.s3.${region}.amazonaws.com/${object_key} `
-    : '';
-}
-
-export { s3, getPresignedParams, getResourceURL };
+export { s3, getPresignedParams };
