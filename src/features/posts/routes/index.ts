@@ -4,27 +4,42 @@ import knex from '../../../../knex/knex';
 import { isLoggedIn } from '../../../middleware/auth';
 
 import { Celebrate } from '../../../lib/celebrate';
-import { getPostByIdSchema, createPostSchema } from '../schemas';
+import {
+  getPostByIdSchema,
+  createPostSchema,
+  votePostSchema
+} from '../schemas';
 import { NotFoundError, BadRequestError } from '../../../utils/errors';
 
 const postsRouter: Router = Router();
 postsRouter.use(isLoggedIn);
 
+const commentsCountSubquery = knex('comments')
+  .count()
+  .where('comments.post_id', knex.raw('??', 'posts.id'))
+  .as('comment_count');
+
+// Note on COALESCE(MAX(...), 0) https://stackoverflow.com/a/33849902
+const voteSubquery = (req: Request) =>
+  knex('post_votes')
+    .select(knex.raw(`COALESCE(MAX(vote), 0)`))
+    .where({
+      'post_votes.post_id': knex.raw('??', 'posts.id'),
+      'post_votes.user_id': knex.raw('??', req.session.user?.userId)
+    })
+    .as('user_vote');
+
 postsRouter.get(
   '/',
-  async (_req: Request, res: Response, next: NextFunction) => {
-    const commentsCountSubquery = knex('comments')
-      .count()
-      .where('comments.post_id', knex.raw('??', 'posts.id'))
-      .as('comment_count');
-
+  async (req: Request, res: Response, next: NextFunction) => {
     const posts = await knex('posts')
       .join('users', 'users.id', 'posts.user_id')
       .select(
         'posts.*',
         'users.username as author',
         'posts.user_id as author_id',
-        commentsCountSubquery
+        commentsCountSubquery,
+        voteSubquery(req)
       )
       .orderBy('posts.created_at', 'desc');
 
@@ -38,18 +53,14 @@ postsRouter.get(
   async (req: Request, res: Response, next: NextFunction) => {
     const { postId } = req.params;
 
-    const commentsCountSubquery = knex('comments')
-      .count()
-      .where('comments.post_id', knex.raw('??', 'posts.id'))
-      .as('comment_count');
-
     const record = await knex('posts')
       .join('users', 'users.id', 'posts.user_id')
       .select(
         'users.username as author',
         'posts.user_id as author_id',
         'posts.*',
-        commentsCountSubquery
+        commentsCountSubquery,
+        voteSubquery(req)
       )
       .where('posts.id', postId)
       .first()
@@ -96,6 +107,39 @@ postsRouter.post(
     } catch (error: any) {
       next(error);
     }
+  }
+);
+
+postsRouter.post(
+  '/vote/:postId',
+  Celebrate(votePostSchema),
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user_id = req.session.user?.userId;
+    const post_id = req.params.postId;
+
+    const vote = req.body.vote ?? 0;
+
+    const prevCountRes = await knex('post_votes')
+      .select('vote')
+      .where({ user_id, post_id })
+      .first();
+
+    const prevCount = prevCountRes?.vote ?? 0;
+
+    await knex.transaction(async (trx) => {
+      await trx('post_votes')
+        .insert({ user_id, post_id, vote })
+        .onConflict(['user_id', 'post_id'])
+        .merge();
+
+      const diff = vote - prevCount;
+      const result = await trx('posts')
+        .where({ id: post_id })
+        .increment('votes', diff)
+        .returning('votes');
+
+      res.send({ post_id, votes: result[0] });
+    });
   }
 );
 

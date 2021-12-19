@@ -14,3 +14,12 @@ export const createPostSchema = {
     key: Joi.string().optional()
   })
 };
+
+export const votePostSchema = {
+  params: Joi.object({
+    postId: Joi.number().required()
+  }),
+  body: Joi.object({
+    vote: Joi.number().integer().min(-1).max(1).required()
+  })
+};
