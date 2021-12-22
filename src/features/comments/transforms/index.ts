@@ -18,5 +18,5 @@ export const nestComments = (commentList: any) => {
     }
   });
 
-  return commentList;
+  return commentList.filter((comment: any) => comment.parent_id === null);
 };

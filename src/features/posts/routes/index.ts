@@ -138,7 +138,7 @@ postsRouter.post(
         .increment('votes', diff)
         .returning('votes');
 
-      res.send({ post_id, votes: result[0] });
+      res.send({ post_id, votes: result[0], user_vote: vote });
     });
   }
 );
