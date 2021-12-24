@@ -1,0 +1,17 @@
+name: deploy
+
+on:
+  push:
+    branches: [ master ]
+  
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - name: Docker build and run images
+        run: |
+           docker-compose build backend
+           docker-compose up --no-deps -d backend
