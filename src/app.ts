@@ -63,22 +63,6 @@ app.use((error, req, res, next) => {
   });
 });
 
-(async function () {
-  let retries = 5;
-  while (retries) {
-    try {
-      await knex.raw('select 1 = 1');
-      break;
-    } catch (e) {
-      if (retries-- === 0) {
-        console.log('Cannot connect to DB. Exiting...');
-        exit(-1);
-      }
-      console.log('Cannot connect to DB. Retrying...');
-      await new Promise((res) => setTimeout(res, 5000));
-    }
-  }
-  app.listen(config.port, () =>
-    console.log(`Server listening on port ${config.port}!`)
-  );
-})();
+app.listen(config.port, () =>
+  console.log(`Server listening on port ${config.port}!`)
+);
