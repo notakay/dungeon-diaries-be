@@ -1,13 +1,26 @@
-version: "3.9"
+version: '3.9'
 services:
- postgres:
-  image: postgres:14.1
-  container_name: postgres
-  restart: always
-  environment:
-   - POSTGRES_USER=postgres
-   - POSTGRES_PASSWORD=postgres
-  ports:
-   - 5432:5432
-  volumes:
-   - ./docker-volumes/postgresql/data:/var/lib/postgresql/data
+  postgres:
+    image: postgres:14.1
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - ./docker-volumes/postgresql/data:/var/lib/postgresql/data
+  backend:
+    build: .
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - AWS_BUCKET=${AWS_BUCKET}
+      - AWS_REGION=${AWS_REGION}
+    depends_on:
+      - postgres
+    ports:
+      - ${PORT}:${PORT}

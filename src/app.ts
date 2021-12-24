@@ -6,6 +6,9 @@ import cors from 'cors';
 import { isCelebrateError } from 'celebrate';
 import { BadRequestError } from './utils/errors';
 
+import knex from '../knex/knex';
+import { exit } from 'process';
+
 const corsOptions = {
   credentials: true,
   origin: ['http://localhost:3000']
@@ -60,4 +63,6 @@ app.use((error, req, res, next) => {
   });
 });
 
-app.listen(config.port, () => console.log('server running'));
+app.listen(config.port, () =>
+  console.log(`Server listening on port ${config.port}!`)
+);
