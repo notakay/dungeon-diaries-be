@@ -1,8 +1,5 @@
 import session from 'express-session';
-import KnexSessionStore from 'connect-session-knex';
 import config from '../../config';
-
-import knex from '../../knex/knex';
 
 declare module 'express-session' {
   export interface SessionData {
@@ -10,8 +7,14 @@ declare module 'express-session' {
   }
 }
 
-const knexSessionStore = KnexSessionStore(session);
-const store = new knexSessionStore({ knex });
+const redis = require('redis');
+const redisStore = require('connect-redis')(session);
+const client = redis.createClient({
+  host: config.redisHost,
+  password: config.redisPassword,
+  port: 6379
+});
+const store = new redisStore({ client });
 
 const secret = config.sessionSecret;
 

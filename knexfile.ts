@@ -4,9 +4,9 @@ import config from './config';
 const generateConfig = (env: string): Knex.Config => ({
   client: 'pg',
   connection: {
-    host: env === 'docker' ? 'postgres' : '127.0.0.1',
+    host: config.dbHost,
     user: 'postgres',
-    password: config['databasePassword'],
+    password: config.dbPassword,
     database: 'dungeon_diaries',
     charset: 'utf8'
   },
