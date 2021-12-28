@@ -14,4 +14,4 @@ jobs:
       - name: Docker build and run images
         run: |
            docker-compose build backend
-           docker-compose up --no-deps -d backend
+           docker-compose up -d backend
