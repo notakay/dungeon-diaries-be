@@ -5,7 +5,9 @@ COPY src ./src
 COPY knex ./knex
 COPY config ./config
 
-COPY *.json .
+COPY package.json .
+COPY package-lock.json .
+COPY tsconfig.json .
 COPY knexfile.ts .
 COPY wait-for-postgres.sh .
 
