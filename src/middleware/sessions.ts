@@ -21,11 +21,14 @@ const secret = config.sessionSecret;
 const hundredDays = 100 * 24 * 60 * 60 * 1000;
 
 export default session({
+  proxy: true,
   secret,
   resave: false,
   cookie: {
     maxAge: hundredDays,
-    httpOnly: true
+    httpOnly: true,
+    secure: config.environment === 'production',
+    sameSite: 'none'
   },
   store
 });

@@ -11,12 +11,13 @@ import { exit } from 'process';
 
 const corsOptions = {
   credentials: true,
-  origin: ['http://localhost:3000']
+  origin: config.frontendUrls
 };
 
 const app: Application = express();
 app.use(express.json());
 app.use(sessions);
+app.set('trust proxy', 1);
 app.use(cors(corsOptions));
 
 app.use('/api', apiRouter);

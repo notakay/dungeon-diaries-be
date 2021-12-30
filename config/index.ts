@@ -19,5 +19,12 @@ export default {
   dbHost: process.env.DB_HOST ?? '127.0.0.1',
   dbPassword: process.env.POSTGRES_PASSWORD,
   redisHost: process.env.REDIS_HOST ?? '127.0.0.1',
-  redisPassword: process.env.REDIS_PASSWORD
+  redisPassword: process.env.REDIS_PASSWORD,
+  frontendUrls:
+    process.env.NODE_ENV === 'production'
+      ? [
+          'https://www.dungeon-diaries.xyz/',
+          'https://dungeon-diaries-fe.vercel.app/'
+        ]
+      : ['http://localhost:3000']
 };
