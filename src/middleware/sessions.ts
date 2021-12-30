@@ -28,7 +28,7 @@ export default session({
     maxAge: hundredDays,
     httpOnly: true,
     secure: config.environment === 'production',
-    sameSite: 'none'
+    domain: 'dungeon-diaries.xyz'
   },
   store
 });
