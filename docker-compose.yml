@@ -1,5 +1,27 @@
 version: '3.3'
 services:
+  nginx:
+    image: nginx:1.21.4
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx-conf:/etc/nginx/conf.d
+      - /opt/docker-volumes/var/www/html:/var/www/html
+      - /opt/docker-volumes/certbot/etc:/etc/letsencrypt
+      - /opt/docker-volumes/certbot/var:/var/lib/letsencrypt
+      - /opt/docker-volumes/dhparam:/etc/ssl/certs
+    depends_on:
+      - backend
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - /opt/docker-volumes/var/www/html:/var/www/html
+      - /opt/docker-volumes/certbot/etc:/etc/letsencrypt
+      - /opt/docker-volumes/certbot/var:/var/lib/letsencrypt
+    depends_on:
+      - nginx
+    command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --force-renewal -v -d api.dungeon-diaries.xyz
   backend:
     build: .
     environment:
