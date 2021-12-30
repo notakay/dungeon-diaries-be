@@ -27,7 +27,7 @@ export default session({
   cookie: {
     maxAge: hundredDays,
     httpOnly: true,
-    secure: config.environment === 'production',
+    secure: config.environment === 'docker',
     domain: 'dungeon-diaries.xyz'
   },
   store

@@ -21,7 +21,7 @@ export default {
   redisHost: process.env.REDIS_HOST ?? '127.0.0.1',
   redisPassword: process.env.REDIS_PASSWORD,
   frontendUrls:
-    process.env.NODE_ENV === 'production'
+    process.env.NODE_ENV === 'docker'
       ? [
           'https://www.dungeon-diaries.xyz/',
           'https://dungeon-diaries-fe.vercel.app/'
