@@ -23,8 +23,8 @@ export default {
   frontendUrls:
     process.env.NODE_ENV === 'docker'
       ? [
-          'https://www.dungeon-diaries.xyz/',
-          'https://dungeon-diaries-fe.vercel.app/'
+          'https://www.dungeon-diaries.xyz',
+          'https://dungeon-diaries-fe.vercel.app'
         ]
       : ['http://localhost:3000']
 };
