@@ -30,6 +30,7 @@ commentsRouter.get(
       .select(
         'comments.*',
         'comments.user_id as author_id',
+        'users.profile_image as author_profile_image',
         'users.username as author'
       )
       .where('comments.post_id', postId)
