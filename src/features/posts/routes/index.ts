@@ -38,6 +38,7 @@ postsRouter.get(
         'posts.*',
         'users.username as author',
         'posts.user_id as author_id',
+        'users.profile_image as author_profile_image',
         commentsCountSubquery,
         voteSubquery(req)
       )
@@ -57,6 +58,7 @@ postsRouter.get(
       .join('users', 'users.id', 'posts.user_id')
       .select(
         'users.username as author',
+        'users.profile_image as author_profile_image',
         'posts.user_id as author_id',
         'posts.*',
         commentsCountSubquery,
