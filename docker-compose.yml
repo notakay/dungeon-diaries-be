@@ -25,6 +25,7 @@ services:
     command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --force-renewal -v -d api.dungeon-diaries.xyz
   backend:
     build: .
+    container_name: backend
     environment:
       - NODE_ENV=${NODE_ENV}
       - PORT=${PORT}
