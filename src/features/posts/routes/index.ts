@@ -10,6 +10,7 @@ import {
   votePostSchema
 } from '../schemas';
 import { NotFoundError, BadRequestError } from '../../../utils/errors';
+import redisClient from '../../../utils/redis/client';
 
 const postsRouter: Router = Router();
 postsRouter.use(isLoggedIn);
@@ -87,14 +88,13 @@ postsRouter.post(
 
       // if uploading image, check db/cache
       if (key) {
-        const result = await knex('upload_intents')
-          .select('object_key')
-          .where('session_id', req.sessionID)
-          .first();
+        const object_key = await redisClient.getAsync(
+          `upload_intents:${req.sessionID}`
+        );
 
         // user could modify the location not much we can do, unless we're
         // getting a callback lambda directly when the image uploads
-        if (result?.object_key === key && location.split('/').pop() === key) {
+        if (object_key === key && location.split('/').pop() === key) {
           image = location;
         } else {
           throw new BadRequestError('Error uploading image');

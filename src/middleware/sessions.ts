@@ -1,5 +1,6 @@
 import session from 'express-session';
 import config from '../../config';
+import redisClient from '../utils/redis/client';
 
 declare module 'express-session' {
   export interface SessionData {
@@ -7,17 +8,9 @@ declare module 'express-session' {
   }
 }
 
-const redis = require('redis');
 const redisStore = require('connect-redis')(session);
-const client = redis.createClient({
-  host: config.redisHost,
-  password: config.redisPassword,
-  port: 6379
-});
-const store = new redisStore({ client });
-
+const store = new redisStore({ client: redisClient });
 const secret = config.sessionSecret;
-
 const hundredDays = 100 * 24 * 60 * 60 * 1000;
 
 export default session({
@@ -28,7 +21,8 @@ export default session({
     maxAge: hundredDays,
     httpOnly: true,
     secure: config.environment === 'docker',
-    domain: 'dungeon-diaries.xyz'
+    domain:
+      config.environment === 'docker' ? 'dungeon-diaries.xyz' : 'localhost'
   },
   store
 });

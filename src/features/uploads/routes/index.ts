@@ -6,6 +6,7 @@ import { s3, getPresignedParams } from '../../../lib/s3';
 import { BadRequestError } from '../../../utils/errors';
 import { Celebrate } from '../../../lib/celebrate';
 import { isLoggedIn } from '../../../middleware/auth';
+import redisClient from '../../../utils/redis/client';
 
 import { imageUploadSchema } from '../schemas';
 
@@ -24,6 +25,13 @@ uploadsRouter.post(
     const params = getPresignedParams(object_key);
     s3.createPresignedPost(params, async (err, data) => {
       if (err) throw new BadRequestError('Error uploading image');
+      await redisClient.setAsync(
+        `upload_intents:${session_id}`,
+        object_key,
+        'EX',
+        90
+      );
+
       // upsert
       await knex('upload_intents')
         .insert({ session_id, object_key })
