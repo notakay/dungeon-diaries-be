@@ -9,6 +9,7 @@
   "dependencies": {
     "aws-sdk": "^2.1046.0",
     "bcrypt": "^5.0.1",
+    "bluebird": "^3.7.2",
     "celebrate": "^15.0.0",
     "connect-redis": "^6.0.0",
     "cors": "^2.8.5",
