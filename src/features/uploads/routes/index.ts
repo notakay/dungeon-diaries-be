@@ -31,13 +31,7 @@ uploadsRouter.post(
         'EX',
         90
       );
-
-      // upsert
-      await knex('upload_intents')
-        .insert({ session_id, object_key })
-        .onConflict('session_id')
-        .merge()
-        .then(() => res.send(data));
+      res.send(data);
     });
   }
 );
