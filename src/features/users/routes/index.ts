@@ -10,6 +10,7 @@ import {
 import { isLoggedIn } from '../../../middleware/auth';
 import { sanitizeUser } from '../transforms';
 import { NotFoundError, BadRequestError } from '../../../utils/errors';
+import redisClient from '../../../utils/redis/client';
 
 const usersRouter: Router = Router();
 
@@ -55,12 +56,11 @@ usersRouter.put(
 
     // TODO refactor copypasta
     if (key) {
-      const result = await knex('upload_intents')
-        .select('object_key')
-        .where('session_id', req.sessionID)
-        .first();
+      const object_key = await redisClient.getAsync(
+        `upload_intents:${req.sessionID}`
+      );
 
-      if (result?.object_key === key && location.split('/').pop() === key) {
+      if (object_key === key && location.split('/').pop() === key) {
         image = location;
       } else {
         throw new BadRequestError('Error uploading image');
