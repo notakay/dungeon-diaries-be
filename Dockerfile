@@ -18,6 +18,7 @@ COPY src ./src
 COPY knex ./knex
 COPY config ./config
 
+COPY package.json .
 COPY tsconfig.json .
 COPY knexfile.ts .
 COPY wait-for-postgres.sh .
