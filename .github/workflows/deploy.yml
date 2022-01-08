@@ -17,6 +17,7 @@ jobs:
           NODE_ENV: ${{ secrets.NODE_ENV }}
           CERTBOT_EMAIL: ${{ secrets.CERTBOT_EMAIL }}
           AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
