@@ -44,6 +44,27 @@ services:
       - redis
     ports:
       - ${PORT}:${PORT}
+  staging:
+    build: .
+    container_name: staging
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - AWS_BUCKET=${AWS_BUCKET}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - ${PORT}:${PORT}
   postgres:
     image: postgres:14.1
     container_name: postgres
