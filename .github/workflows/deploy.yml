@@ -2,8 +2,8 @@ name: deploy
 
 on:
   push:
-    branches: [ master ]
-  
+    branches: [master]
+
   workflow_dispatch:
 
 jobs:
@@ -12,6 +12,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Docker build and run images
+        env:
+          PORT: ${{ secrets.PORT }}
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
         run: |
-           docker-compose build backend
-           docker-compose up -d backend
+          docker-compose build backend
+          docker-compose up -d backend
