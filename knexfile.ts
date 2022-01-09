@@ -1,21 +1,15 @@
-import { Knex } from 'knex';
 import config from './config';
 
-const generateConfig = (env: string): Knex.Config => ({
+export default {
   client: 'pg',
   connection: {
     host: config.dbHost,
-    user: 'postgres',
+    user: config.dbUser,
     password: config.dbPassword,
-    database: 'dungeon_diaries',
+    database: config.dbName,
     charset: 'utf8'
   },
   migrations: {
     directory: __dirname + '/knex/migrations'
   }
-});
-
-export default {
-  development: generateConfig('development'),
-  docker: generateConfig('docker')
 };
