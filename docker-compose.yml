@@ -22,7 +22,7 @@ services:
       - /opt/docker-volumes/certbot/var:/var/lib/letsencrypt
     depends_on:
       - nginx
-    command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --force-renewal -v -d api.dungeon-diaries.xyz
+    command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --force-renewal -v -d api.dungeon-diaries.xyz -d staging.api.dungeon-diaries.xyz
   backend:
     build: .
     container_name: backend
@@ -42,8 +42,8 @@ services:
     depends_on:
       - postgres
       - redis
-    ports:
-      - ${PORT}:${PORT}
+    expose:
+      - ${PORT}
   staging:
     build: .
     container_name: staging
@@ -63,8 +63,8 @@ services:
     depends_on:
       - postgres
       - redis
-    ports:
-      - ${PORT}:${PORT}
+    expose:
+      - ${PORT}
   postgres:
     image: postgres:14.1
     container_name: postgres
