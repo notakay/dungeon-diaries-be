@@ -9,7 +9,7 @@ import { usersRouter } from '../features/users/routes';
 const apiRouter = Router();
 
 apiRouter.get('/health-check', (_req, res) => res.send('OK'));
-apiRouter.get('/prod-check', (_req, res) => res.json(config.frontendUrls));
+apiRouter.get('/prod-check', (_req, res) => res.json(config.frontendUrl));
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/comments', commentsRouter);
 apiRouter.use('/posts', postsRouter);
