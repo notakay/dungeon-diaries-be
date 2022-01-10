@@ -1,4 +1,4 @@
-name: deploy
+name: production
 
 on:
   push:
@@ -15,7 +15,10 @@ jobs:
         env:
           PORT: ${{ secrets.PORT }}
           NODE_ENV: ${{ secrets.NODE_ENV }}
+          DOMAIN: ${{ secrets.DOMAIN }}
           CERTBOT_EMAIL: ${{ secrets.CERTBOT_EMAIL }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
           AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
