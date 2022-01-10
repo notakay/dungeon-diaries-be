@@ -14,11 +14,11 @@ jobs:
       - name: Docker build and run images
         env:
           PORT: ${{ secrets.PORT }}
-          NODE_ENV: ${{ secrets.NODE_ENV_STAGING }}
-          DOMAIN: ${{ secrets.DOMAIN_STAGING }}
+          NODE_ENV_STAGING: ${{ secrets.NODE_ENV_STAGING }}
+          DOMAIN_STAGING: ${{ secrets.DOMAIN_STAGING }}
           CERTBOT_EMAIL: ${{ secrets.CERTBOT_EMAIL }}
-          FRONTEND_URL: ${{ secrets.FRONTEND_URL_STAGING }}
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME_STAGING }}
+          FRONTEND_URL_STAGING: ${{ secrets.FRONTEND_URL_STAGING }}
+          DATABASE_NAME_STAGING: ${{ secrets.DATABASE_NAME_STAGING }}
           AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
