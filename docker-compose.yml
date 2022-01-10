@@ -22,28 +22,59 @@ services:
       - /opt/docker-volumes/certbot/var:/var/lib/letsencrypt
     depends_on:
       - nginx
-    command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --force-renewal -v -d api.dungeon-diaries.xyz
+    command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --force-renewal -v -d api.dungeon-diaries.xyz -d api.staging.dungeon-diaries.xyz
   backend:
     build: .
+    image: backend:production
     container_name: backend
     environment:
-      - NODE_ENV=${NODE_ENV}
+      - NODE_ENV=production
       - PORT=${PORT}
+      - DOMAIN=${DOMAIN}
+      - FRONTEND_URL=${FRONTEND_URL}
       - CERTBOT_EMAIL=${CERTBOT_EMAIL}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - SESSION_SECRET=${SESSION_SECRET}
-      - AWS_BUCKET=${AWS_BUCKET}
       - AWS_REGION=${AWS_REGION}
+      - AWS_BUCKET=${AWS_BUCKET}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     depends_on:
       - postgres
       - redis
-    ports:
-      - ${PORT}:${PORT}
+    expose:
+      - ${PORT}
+  staging:
+    build: .
+    image: backend:staging
+    container_name: staging
+    environment:
+      - NODE_ENV=staging
+      - PORT=${PORT}
+      - DOMAIN=${DOMAIN_STAGING}
+      - FRONTEND_URL=${FRONTEND_URL_STAGING}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_BUCKET=${AWS_BUCKET}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - DATABASE_NAME=${DATABASE_NAME_STAGING}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      - postgres
+      - redis
+    expose:
+      - ${PORT}
   postgres:
     image: postgres:14.1
     container_name: postgres

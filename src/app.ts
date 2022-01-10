@@ -11,7 +11,7 @@ import { exit } from 'process';
 
 const corsOptions = {
   credentials: true,
-  origin: config.frontendUrls
+  origin: config.frontendUrl
 };
 
 const app: Application = express();

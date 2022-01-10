@@ -20,9 +20,8 @@ export default session({
   cookie: {
     maxAge: hundredDays,
     httpOnly: true,
-    secure: config.environment === 'docker',
-    domain:
-      config.environment === 'docker' ? 'dungeon-diaries.xyz' : 'localhost'
+    secure: config.environment !== 'development',
+    domain: config.domain
   },
   store
 });
