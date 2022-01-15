@@ -12,8 +12,6 @@ services:
       - /opt/docker-volumes/certbot/etc:/etc/letsencrypt
       - /opt/docker-volumes/certbot/var:/var/lib/letsencrypt
       - /opt/docker-volumes/dhparam:/etc/ssl/certs
-    depends_on:
-      - backend
   certbot:
     image: certbot/certbot
     volumes:
@@ -23,32 +21,6 @@ services:
     depends_on:
       - nginx
     command: certonly --webroot --webroot-path=/var/www/html --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email --force-renewal -v -d api.dungeon-diaries.xyz -d api.staging.dungeon-diaries.xyz
-  backend:
-    build: .
-    image: backend:${BUILD_TAG}
-    container_name: ${BUILD_TAG}
-    environment:
-      - NODE_ENV=${NODE_ENV}
-      - PORT=${PORT}
-      - DOMAIN=${DOMAIN}
-      - FRONTEND_URL=${FRONTEND_URL}
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
-      - SESSION_SECRET=${SESSION_SECRET}
-      - AWS_REGION=${AWS_REGION}
-      - AWS_BUCKET=${AWS_BUCKET}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - DATABASE_NAME=${DATABASE_NAME}
-      - POSTGRES_HOST=${POSTGRES_HOST}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-    depends_on:
-      - postgres
-      - redis
-    expose:
-      - ${PORT}
   postgres:
     image: postgres:14.1
     container_name: postgres

@@ -31,5 +31,5 @@ jobs:
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET_STAGING }}
         run: |
-          docker-compose build backend
-          docker-compose up -d backend
+          docker-compose -f docker-compose.yml -f docker-compose.staging.yml build staging
+          docker-compose -f docker-compose.yml -f docker-compose.staging.yml up -d staging
