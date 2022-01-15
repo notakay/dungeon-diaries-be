@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Docker build and run images
         env:
-          PORT: ${{ secrets.PORT }}
+          PORT: ${{ secrets.PORT_STAGING }}
           BUILD_TAG: ${{ secrets.BUILD_TAG_STAGING }}
           NODE_ENV_STAGING: ${{ secrets.NODE_ENV_STAGING }}
           DOMAIN_STAGING: ${{ secrets.DOMAIN_STAGING }}
