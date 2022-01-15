@@ -14,7 +14,6 @@ jobs:
       - name: Docker build and run images
         env:
           PORT: ${{ secrets.PORT_STAGING }}
-          BUILD_TAG: ${{ secrets.BUILD_TAG_STAGING }}
           NODE_ENV: ${{ secrets.NODE_ENV_STAGING }}
           DOMAIN: ${{ secrets.DOMAIN_STAGING }}
           CERTBOT_EMAIL: ${{ secrets.CERTBOT_EMAIL }}
@@ -31,5 +30,5 @@ jobs:
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET_STAGING }}
         run: |
-          docker-compose build backend
-          docker-compose up -d backend
+          docker-compose -f docker-compose.yml -f docker-compose.staging.yml build staging
+          docker-compose -f docker-compose.yml -f docker-compose.staging.yml up -d staging
