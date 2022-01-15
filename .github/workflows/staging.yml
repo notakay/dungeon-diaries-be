@@ -14,7 +14,6 @@ jobs:
       - name: Docker build and run images
         env:
           PORT: ${{ secrets.PORT_STAGING }}
-          BUILD_TAG: ${{ secrets.BUILD_TAG_STAGING }}
           NODE_ENV: ${{ secrets.NODE_ENV_STAGING }}
           DOMAIN: ${{ secrets.DOMAIN_STAGING }}
           CERTBOT_EMAIL: ${{ secrets.CERTBOT_EMAIL }}
