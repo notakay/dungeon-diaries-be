@@ -13,12 +13,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Docker build and run images
         env:
-          PORT: ${{ secrets.PORT_STAGING }}
+          PORT: ${{ secrets.PORT }}
           NODE_ENV: ${{ secrets.NODE_ENV_STAGING }}
           DOMAIN: ${{ secrets.DOMAIN_STAGING }}
-          CERTBOT_EMAIL: ${{ secrets.CERTBOT_EMAIL }}
           FRONTEND_URL: ${{ secrets.FRONTEND_URL_STAGING }}
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME_STAGING }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
           AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
