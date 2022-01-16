@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: [self-hosted, production]
     steps:
       - uses: actions/checkout@v2
       - name: Docker build and run images
@@ -31,5 +31,5 @@ jobs:
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
         run: |
-          docker-compose -f docker-compose.yml -f docker-compose.production.yml build production 
-          docker-compose -f docker-compose.yml -f docker-compose.production.yml up -d production
+          docker-compose build backend 
+          docker-compose up -d backend
