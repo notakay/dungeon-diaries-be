@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: [self-hosted, staging]
     steps:
       - uses: actions/checkout@v2
       - name: Docker build and run images

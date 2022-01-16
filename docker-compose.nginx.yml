@@ -1,0 +1,14 @@
+version: '3.3'
+services:
+  nginx:
+    image: nginx:1.21.4
+    container_name: nginx
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /opt/dungeon-diaries/etc/nginx/conf.d:/etc/nginx/conf.d
+      - /opt/dungeon-diaries/var/www/html:/var/www/html
+      - /opt/dungeon-diaries/etc/letsencrypt:/etc/letsencrypt
+      - /opt/dungeon-diaries/var/lib/letsencrypt:/var/lib/letsencrypt
+      - /opt/dungeon-diaries/etc/ssl/certs:/etc/ssl/certs
