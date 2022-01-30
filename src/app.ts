@@ -1,4 +1,4 @@
-import config from '../config';
+import { env } from './config';
 import express, { Application } from 'express';
 import { apiRouter } from './routes';
 import sessions from './middleware/sessions';
@@ -6,12 +6,9 @@ import cors from 'cors';
 import { isCelebrateError } from 'celebrate';
 import { BadRequestError } from './utils/errors';
 
-import knex from '../knex/knex';
-import { exit } from 'process';
-
 const corsOptions = {
   credentials: true,
-  origin: config.frontendUrl
+  origin: env.frontendUrl
 };
 
 const app: Application = express();
@@ -64,6 +61,6 @@ app.use((error, req, res, next) => {
   });
 });
 
-app.listen(config.port, () =>
-  console.log(`Server listening on port ${config.port}!`)
+app.listen(env.port, () =>
+  console.log(`Server listening on port ${env.port}!`)
 );

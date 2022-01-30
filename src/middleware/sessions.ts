@@ -1,5 +1,5 @@
 import session from 'express-session';
-import config from '../../config';
+import { env } from '../config';
 import redisClient from '../utils/redis/client';
 
 declare module 'express-session' {
@@ -10,7 +10,7 @@ declare module 'express-session' {
 
 const redisStore = require('connect-redis')(session);
 const store = new redisStore({ client: redisClient });
-const secret = config.sessionSecret;
+const secret = env.sessionSecret;
 const hundredDays = 100 * 24 * 60 * 60 * 1000;
 
 export default session({
@@ -20,8 +20,8 @@ export default session({
   cookie: {
     maxAge: hundredDays,
     httpOnly: true,
-    secure: config.environment !== 'development',
-    domain: config.domain
+    secure: env.environment !== 'development',
+    domain: env.domain
   },
   store
 });

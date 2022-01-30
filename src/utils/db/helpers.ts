@@ -1,4 +1,4 @@
-import knex from '../../../knex/knex';
+import knex from '../../config/knex';
 
 export const existsInTable: (
   table: string,

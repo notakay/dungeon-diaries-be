@@ -1,4 +1,4 @@
-import config from '../../../config';
+import { env } from '../../config';
 
 const redis = require('redis');
 const { promisifyAll } = require('bluebird');
@@ -6,7 +6,7 @@ const { promisifyAll } = require('bluebird');
 promisifyAll(redis);
 
 export default redis.createClient({
-  host: config.redisHost,
-  password: config.redisPassword,
+  host: env.redisHost,
+  password: env.redisPassword,
   port: 6379
 });

@@ -1,13 +1,11 @@
-import config from '../../config';
+import { env } from '../config';
 import S3 from 'aws-sdk/clients/s3';
 
-const { bucket, region } = config;
-
-const s3 = new S3({ region });
+const s3 = new S3({ region: env.region });
 
 function getPresignedParams(object_key: string) {
   return {
-    Bucket: config.bucket,
+    Bucket: env.bucket,
     Fields: {
       key: object_key,
       acl: 'public-read',

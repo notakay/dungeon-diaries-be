@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import { Celebrate } from '../../../lib/celebrate';
 
-import knex from '../../../../knex/knex';
+import { knex } from '../../../config';
 import * as dbHelper from '../../../utils/db/helpers';
 import { BadRequestError } from '../../../utils/errors';
 import { registerSchema, loginSchema } from '../schemas';

@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 
-import knex from '../../../../knex/knex';
+import knex from '../../../config/knex';
 import { s3, getPresignedParams } from '../../../lib/s3';
 import { BadRequestError } from '../../../utils/errors';
 import { Celebrate } from '../../../lib/celebrate';

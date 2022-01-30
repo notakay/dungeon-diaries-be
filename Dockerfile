@@ -23,4 +23,4 @@ COPY tsconfig.json .
 COPY knexfile.ts .
 COPY wait-for-postgres.sh .
 
-CMD ./wait-for-postgres.sh && knex migrate:latest && npm run build && npm run start
+CMD ./wait-for-postgres.sh && npm run migrate && npm run build && npm run start

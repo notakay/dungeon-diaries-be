@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ path: __dirname + '/../../.env' });
 
 const ENV_VARS = {
   environment: 'NODE_ENV',
@@ -17,11 +17,11 @@ const ENV_VARS = {
   redisPassword: 'REDIS_PASSWORD'
 };
 
-const config: { [key: string]: any } = {};
+const env: { [key: string]: any } = {};
 
 for (let [key, value] of Object.entries(ENV_VARS)) {
   if (!process.env[value]) console.log(`${value} has not been set.`);
-  config[key] = process.env[value] ?? '';
+  env[key] = process.env[value] ?? '';
 }
 
-export default config;
+export default env;

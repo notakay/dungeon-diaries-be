@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 
-import knex from '../../../../knex/knex';
+import { knex } from '../../../config';
 import { Celebrate } from '../../../lib/celebrate';
 import {
   profileUpdateSchema,

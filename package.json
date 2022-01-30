@@ -4,6 +4,7 @@
   "scripts": {
     "start": "node build/src/app.js",
     "dev": "nodemon src/app.ts",
+    "migrate": "knex --knexfile src/config/knexfile.ts migrate:latest",
     "build": "tsc -p ."
   },
   "dependencies": {

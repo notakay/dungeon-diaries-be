@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 
-import knex from '../../../../knex/knex';
+import { knex } from '../../../config';
 import { isLoggedIn } from '../../../middleware/auth';
 
 import { Celebrate } from '../../../lib/celebrate';
@@ -32,7 +32,7 @@ const voteSubquery = (req: Request) =>
 
 postsRouter.get(
   '/',
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const posts = await knex('posts')
       .join('users', 'users.id', 'posts.user_id')
       .select(

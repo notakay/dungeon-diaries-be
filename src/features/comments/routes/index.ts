@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 
-import knex from '../../../../knex/knex';
+import { knex } from '../../../config';
 import { isLoggedIn } from '../../../middleware/auth';
 import { Celebrate } from '../../../lib/celebrate';
 import {
@@ -21,9 +21,8 @@ commentsRouter.use(isLoggedIn);
 commentsRouter.get(
   '/:postId',
   Celebrate(getCommentsSchema),
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { postId } = req.params;
-    const { commentId = null, depth = 1 } = req.body;
 
     const rawRecords = await knex('comments')
       .join('users', 'users.id', 'comments.user_id')
@@ -47,7 +46,7 @@ commentsRouter.get(
 commentsRouter.post(
   '/:postId',
   Celebrate(createCommentSchema),
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { postId } = req.params;
     const { content, parentCommentId = null } = req.body;
 
@@ -82,7 +81,7 @@ commentsRouter.post(
 commentsRouter.delete(
   '/:commentId',
   Celebrate(deleteCommentSchema),
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, _next: NextFunction) => {
     const { commentId } = req.params;
     const authUserId = req.session.user?.userId;
 
