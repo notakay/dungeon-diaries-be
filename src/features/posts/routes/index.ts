@@ -12,6 +12,8 @@ import {
 import { NotFoundError, BadRequestError } from '../../../utils/errors';
 import redisClient from '../../../utils/redis/client';
 
+import PostsModel from '../../../models/posts';
+
 const postsRouter: Router = Router();
 postsRouter.use(isLoggedIn);
 
@@ -49,31 +51,20 @@ postsRouter.get(
   }
 );
 
-postsRouter.get(
-  '/:postId',
-  Celebrate(getPostByIdSchema),
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { postId } = req.params;
+postsRouter.get('/:postId', async (req: Request, res: Response) => {
+  const posts = new PostsModel();
+  const postId = req.params.postId;
+  const userId = req.session.user?.userId;
 
-    const record = await knex('posts')
-      .join('users', 'users.id', 'posts.user_id')
-      .select(
-        'users.username as author',
-        'users.profile_image as author_profile_image',
-        'posts.user_id as author_id',
-        'posts.*',
-        commentsCountSubquery,
-        voteSubquery(req)
-      )
-      .where('posts.id', postId)
-      .first()
-      .catch((error) => next(error));
-    if (!record) {
-      return next(new NotFoundError(`Post with id ${postId} not found`));
-    }
-    res.send(record);
-  }
-);
+  // NOTE: comment_count is returned as a string instead of a number
+  // https://github.com/brianc/node-postgres/pull/353
+  const result = await posts.get(postId, userId).then((record) => {
+    if (!record) throw new NotFoundError(`Post with id ${postId} not found`);
+    return record;
+  });
+
+  res.send(result);
+});
 
 postsRouter.post(
   '/',
