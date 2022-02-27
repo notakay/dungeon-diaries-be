@@ -25,9 +25,9 @@ postsRouter.get('/', async (req: Request, res: Response) => {
   const userId = req.session.user?.userId;
 
   // Handle QueryString.ParsedQs ts warning
-  const offset = parseInt((req.query as any).offset) || 0;
+  const cursor = parseInt((req.query as any).cursor) || null;
 
-  const result = await posts.list(offset, PAGE_SIZE, userId);
+  const result = await posts.list(cursor, PAGE_SIZE, userId);
   res.json({ posts: result });
 });
 

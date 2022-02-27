@@ -7,11 +7,11 @@ export default class Posts {
 
   // cursor based pagination
   // https://stackoverflow.com/questions/18314687/how-to-implement-cursors-for-pagination-in-an-api
-  list(offset: number, pageSize: number, userId: string | number) {
-    return selectPosts(userId)
-      .orderBy('posts.created_at', 'desc')
-      .offset(offset * pageSize)
-      .limit(pageSize);
+  // NOTE: need to take care of ordering when introducing sorting
+  list(cursor: number | null, pageSize: number, userId: string | number) {
+    let query = selectPosts(userId);
+    if (cursor !== null) query = query.where('posts.id', '<', cursor);
+    return query.orderBy('posts.created_at', 'desc').limit(pageSize);
   }
 }
 
