@@ -15,41 +15,21 @@ import redisClient from '../../../utils/redis/client';
 import PostsModel from '../../../models/posts';
 
 const postsRouter: Router = Router();
+const PAGE_SIZE = 10;
+
 postsRouter.use(isLoggedIn);
 
-const commentsCountSubquery = knex('comments')
-  .count()
-  .where('comments.post_id', knex.raw('??', 'posts.id'))
-  .as('comment_count');
+// Add sorting, currently sorts by date
+postsRouter.get('/', async (req: Request, res: Response) => {
+  const posts = new PostsModel();
+  const userId = req.session.user?.userId;
 
-// Note on COALESCE(MAX(...), 0) https://stackoverflow.com/a/33849902
-const voteSubquery = (req: Request) =>
-  knex('post_votes')
-    .select(knex.raw(`COALESCE(MAX(vote), 0)`))
-    .where({
-      'post_votes.post_id': knex.raw('??', 'posts.id'),
-      'post_votes.user_id': knex.raw('??', req.session.user?.userId)
-    })
-    .as('user_vote');
+  // Handle QueryString.ParsedQs ts warning
+  const offset = parseInt((req.query as any).offset) || 0;
 
-postsRouter.get(
-  '/',
-  async (req: Request, res: Response, next: NextFunction) => {
-    const posts = await knex('posts')
-      .join('users', 'users.id', 'posts.user_id')
-      .select(
-        'posts.*',
-        'users.username as author',
-        'posts.user_id as author_id',
-        'users.profile_image as author_profile_image',
-        commentsCountSubquery,
-        voteSubquery(req)
-      )
-      .orderBy('posts.created_at', 'desc');
-
-    res.json({ posts: posts });
-  }
-);
+  const result = await posts.list(offset, PAGE_SIZE, userId);
+  res.json({ posts: result });
+});
 
 postsRouter.get('/:postId', async (req: Request, res: Response) => {
   const posts = new PostsModel();
