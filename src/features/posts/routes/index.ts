@@ -12,68 +12,39 @@ import {
 import { NotFoundError, BadRequestError } from '../../../utils/errors';
 import redisClient from '../../../utils/redis/client';
 
+import PostsModel from '../../../models/posts';
+
 const postsRouter: Router = Router();
+const PAGE_SIZE = 10;
+
 postsRouter.use(isLoggedIn);
 
-const commentsCountSubquery = knex('comments')
-  .count()
-  .where('comments.post_id', knex.raw('??', 'posts.id'))
-  .as('comment_count');
+// Add sorting, currently sorts by date
+postsRouter.get('/', async (req: Request, res: Response) => {
+  const posts = new PostsModel();
+  const userId = req.session.user?.userId;
 
-// Note on COALESCE(MAX(...), 0) https://stackoverflow.com/a/33849902
-const voteSubquery = (req: Request) =>
-  knex('post_votes')
-    .select(knex.raw(`COALESCE(MAX(vote), 0)`))
-    .where({
-      'post_votes.post_id': knex.raw('??', 'posts.id'),
-      'post_votes.user_id': knex.raw('??', req.session.user?.userId)
-    })
-    .as('user_vote');
+  // Handle QueryString.ParsedQs ts warning
+  const cursor = parseInt((req.query as any).cursor) || null;
 
-postsRouter.get(
-  '/',
-  async (req: Request, res: Response, next: NextFunction) => {
-    const posts = await knex('posts')
-      .join('users', 'users.id', 'posts.user_id')
-      .select(
-        'posts.*',
-        'users.username as author',
-        'posts.user_id as author_id',
-        'users.profile_image as author_profile_image',
-        commentsCountSubquery,
-        voteSubquery(req)
-      )
-      .orderBy('posts.created_at', 'desc');
+  const result = await posts.list(cursor, PAGE_SIZE, userId);
+  res.json({ posts: result });
+});
 
-    res.json({ posts: posts });
-  }
-);
+postsRouter.get('/:postId', async (req: Request, res: Response) => {
+  const posts = new PostsModel();
+  const postId = req.params.postId;
+  const userId = req.session.user?.userId;
 
-postsRouter.get(
-  '/:postId',
-  Celebrate(getPostByIdSchema),
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { postId } = req.params;
+  // NOTE: comment_count is returned as a string instead of a number
+  // https://github.com/brianc/node-postgres/pull/353
+  const result = await posts.get(postId, userId).then((record) => {
+    if (!record) throw new NotFoundError(`Post with id ${postId} not found`);
+    return record;
+  });
 
-    const record = await knex('posts')
-      .join('users', 'users.id', 'posts.user_id')
-      .select(
-        'users.username as author',
-        'users.profile_image as author_profile_image',
-        'posts.user_id as author_id',
-        'posts.*',
-        commentsCountSubquery,
-        voteSubquery(req)
-      )
-      .where('posts.id', postId)
-      .first()
-      .catch((error) => next(error));
-    if (!record) {
-      return next(new NotFoundError(`Post with id ${postId} not found`));
-    }
-    res.send(record);
-  }
-);
+  res.send(result);
+});
 
 postsRouter.post(
   '/',
